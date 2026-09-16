@@ -336,37 +336,36 @@ if __name__ == "__main__":
         ticket_features,
     )
 
-    customers_with_churn = (
-    generate_churn_labels(
+    customers_with_churn = generate_churn_labels(
         customer_features
     )
-)
+
     save_churn_data(
-    customers_with_churn
-)
+        customers_with_churn
+    )
 
     print(
-    customers_with_churn[
-        [
-            "customer_id",
-            "country",
-            "segment",
-            "contract_type",
-            "failure_rate",
-            "billing_ticket_rate",
-            "churn_probability",
-            "status",
-        ]
-    ].head()
-)
+        customers_with_churn[
+            [
+                "customer_id",
+                "country",
+                "segment",
+                "contract_type",
+                "failure_rate",
+                "billing_ticket_rate",
+                "churn_probability",
+                "status",
+            ]
+        ].head()
+    )
 
-overall_churn_rate = (
-    customers_with_churn["status"]
-    .eq("Churned")
-    .mean()
-)
+    overall_churn_rate = (
+        customers_with_churn["status"]
+        .eq("Churned")
+        .mean()
+    )
 
-print(
-    f"\nOverall churn rate: "
-    f"{overall_churn_rate:.2%}"
-)
+    print(
+        f"\nOverall churn rate: "
+        f"{overall_churn_rate:.2%}"
+    )
