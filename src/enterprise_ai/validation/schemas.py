@@ -38,7 +38,4 @@ class Customer(BaseModel):
         le=1000,
     )
 
-    status: Literal[
-        "Active",
-        "Churned",
-    ]
+    

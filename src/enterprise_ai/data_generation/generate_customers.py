@@ -57,11 +57,6 @@ def generate_customers(
         2,
     )
 
-    status = rng.choice(
-        ["Active", "Churned"],
-        size=num_customers,
-        p=[0.82, 0.18],
-    )
 
     customers = pd.DataFrame(
         {
@@ -70,8 +65,7 @@ def generate_customers(
             "segment": segments,
             "signup_date": signup_dates,
             "contract_type": contract_types,
-            "monthly_fee": monthly_fees,
-            "status": status,
+            "monthly_fee": monthly_fees    
         }
     )
 

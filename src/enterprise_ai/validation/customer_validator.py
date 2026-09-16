@@ -11,7 +11,7 @@ REQUIRED_COLUMNS = {
     "signup_date",
     "contract_type",
     "monthly_fee",
-    "status",
+    
 }
 
 
