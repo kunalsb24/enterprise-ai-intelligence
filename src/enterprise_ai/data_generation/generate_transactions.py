@@ -19,6 +19,10 @@ def generate_transactions(
 
     rng = np.random.default_rng(seed)
 
+    # ---------------------------------------------------------
+    # 1. Generate transaction attributes
+    # ---------------------------------------------------------
+
     customer_ids = rng.choice(
         customers["customer_id"],
         size=num_transactions,
@@ -84,19 +88,9 @@ def generate_transactions(
         2,
     )
 
-    payment_status = rng.choice(
-        [
-            "Successful",
-            "Failed",
-            "Refunded",
-        ],
-        size=num_transactions,
-        p=[
-            0.94,
-            0.04,
-            0.02,
-        ],
-    )
+    # ---------------------------------------------------------
+    # 2. Create transaction DataFrame
+    # ---------------------------------------------------------
 
     transactions = pd.DataFrame(
         {
@@ -106,11 +100,108 @@ def generate_transactions(
             "product": products,
             "channel": channels,
             "amount": amounts,
-            "payment_status": payment_status,
         }
     )
 
+    # ---------------------------------------------------------
+    # 3. Temporarily attach customer attributes
+    # ---------------------------------------------------------
+
+    customer_attributes = customers[
+        [
+            "customer_id",
+            "country",
+            "segment",
+        ]
+    ]
+
+    transactions = transactions.merge(
+        customer_attributes,
+        on="customer_id",
+        how="left",
+    )
+
+    # ---------------------------------------------------------
+    # 4. Identify Germany Enterprise Q2 incident
+    # ---------------------------------------------------------
+
+    incident_mask = (
+        (transactions["country"] == "Germany")
+        & (transactions["segment"] == "Enterprise")
+        & (
+            transactions["transaction_date"].between(
+                "2025-04-01",
+                "2025-06-30",
+            )
+        )
+    )
+
+    # ---------------------------------------------------------
+    # 5. Generate normal payment behavior
+    # ---------------------------------------------------------
+
+    random_values = rng.random(
+        len(transactions)
+    )
+
+    # Default = successful
+    transactions["payment_status"] = "Successful"
+
+    # 4% failed
+    transactions.loc[
+        random_values < 0.04,
+        "payment_status",
+    ] = "Failed"
+
+    # 2% refunded
+    transactions.loc[
+        (random_values >= 0.04)
+        & (random_values < 0.06),
+        "payment_status",
+    ] = "Refunded"
+
+    # ---------------------------------------------------------
+    # 6. Inject Germany Enterprise Q2 billing incident
+    # ---------------------------------------------------------
+
+    incident_random = rng.random(
+        len(transactions)
+    )
+
+    # Start incident population as successful
+    transactions.loc[
+        incident_mask,
+        "payment_status",
+    ] = "Successful"
+
+    # 20% failures
+    transactions.loc[
+        incident_mask
+        & (incident_random < 0.20),
+        "payment_status",
+    ] = "Failed"
+
+    # 4% refunds
+    transactions.loc[
+        incident_mask
+        & (incident_random >= 0.20)
+        & (incident_random < 0.24),
+        "payment_status",
+    ] = "Refunded"
+
+    # ---------------------------------------------------------
+    # 7. Remove temporary customer attributes
+    # ---------------------------------------------------------
+
+    transactions = transactions.drop(
+        columns=[
+            "country",
+            "segment",
+        ]
+    )
+
     return transactions
+
 
 
 def save_transactions(
