@@ -16,9 +16,10 @@ def get_database_url() -> str:
     database = os.getenv("POSTGRES_DB", "enterprise_ai")
     user = os.getenv("POSTGRES_USER", "enterprise_user")
     password = os.getenv("POSTGRES_PASSWORD", "enterprise_password")
+    driver = os.getenv("POSTGRES_DRIVER", "psycopg")
 
     return (
-        f"postgresql+psycopg://{user}:{password}"
+        f"postgresql+{driver}://{user}:{password}"
         f"@{host}:{port}/{database}"
     )
 
