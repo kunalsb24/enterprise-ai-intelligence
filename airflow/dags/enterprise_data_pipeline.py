@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from airflow import DAG
@@ -80,6 +80,12 @@ def verify_database():
 
     print(f"Database verification passed: {actual_counts}")
 
+DEFAULT_ARGS = {
+    "owner": "enterprise-ai",
+    "retries": 2,
+    "retry_delay": timedelta(minutes=1),
+}
+
 with DAG(
     dag_id="enterprise_data_pipeline",
     description="Enterprise AI data ingestion and validation pipeline",
@@ -87,20 +93,25 @@ with DAG(
     schedule=None,
     catchup=False,
     tags=["enterprise-ai", "data-pipeline"],
+    default_args=DEFAULT_ARGS,
 ) as dag:
 
     validate_customers = PythonOperator(
         task_id="validate_customers",
         python_callable=validate_customer_data,
+        execution_timeout=timedelta(minutes=5),
     )
 
     load_database_task = PythonOperator(
         task_id="load_database",
         python_callable=load_database,
+        execution_timeout=timedelta(minutes=15),
     )
     verify_database_task = PythonOperator(
         task_id="verify_database",
         python_callable=verify_database,
+        execution_timeout=timedelta(minutes=5),
     )
+
 
     validate_customers >> load_database_task >> verify_database_task
