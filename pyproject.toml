@@ -17,6 +17,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "psycopg[binary]>=3.1",
     "pyspark>=3.5,<4.0",
+    "sentence-transformers",
 ]
 
 [project.optional-dependencies]
