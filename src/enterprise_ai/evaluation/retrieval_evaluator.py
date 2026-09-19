@@ -1,4 +1,6 @@
 from enterprise_ai.embeddings.model import EmbeddingModel
+from enterprise_ai.reranking.model import RerankingModel
+
 from enterprise_ai.evaluation.models import (
     RetrievalCaseResult,
     RetrievalEvaluationCase,
@@ -11,6 +13,7 @@ from enterprise_ai.evaluation.retrieval_metrics import (
     reciprocal_rank,
 )
 from enterprise_ai.vector_store.retrieval import (
+    retrieve_and_rerank_chunks,
     retrieve_chunks,
 )
 
@@ -52,6 +55,66 @@ def evaluate_retrieval(
 
         recall_scores.append(recall_score)
         reciprocal_rank_scores.append(rank_score)
+        case_results.append(
+            RetrievalCaseResult(
+                question=case.question,
+                expected_document=case.expected_document,
+                retrieved_documents=retrieved_documents,
+                recall_at_k=recall_score,
+                reciprocal_rank=rank_score,
+            )
+        )
+
+    return RetrievalEvaluationResult(
+        recall_at_k=mean_recall_at_k(recall_scores),
+        mean_reciprocal_rank=mean_reciprocal_rank(
+            reciprocal_rank_scores
+        ),
+        case_results=case_results,
+    )
+
+def evaluate_reranked_retrieval(
+    cases: list[RetrievalEvaluationCase],
+    k: int = 3,
+    candidate_limit: int = 10,
+) -> RetrievalEvaluationResult:
+    """Evaluate retrieval quality after cross-encoder reranking."""
+
+    recall_scores = []
+    reciprocal_rank_scores = []
+    case_results = []
+
+    embedding_model = EmbeddingModel()
+    reranking_model = RerankingModel()
+
+    for case in cases:
+        retrieved_chunks = retrieve_and_rerank_chunks(
+            query=case.question,
+            candidate_limit=candidate_limit,
+            final_limit=k,
+            embedding_model=embedding_model,
+            reranking_model=reranking_model,
+        )
+
+        retrieved_documents = [
+            chunk.document_name
+            for chunk in retrieved_chunks
+        ]
+
+        recall_score = recall_at_k(
+            retrieved_documents=retrieved_documents,
+            expected_document=case.expected_document,
+            k=k,
+        )
+
+        rank_score = reciprocal_rank(
+            retrieved_documents=retrieved_documents,
+            expected_document=case.expected_document,
+        )
+
+        recall_scores.append(recall_score)
+        reciprocal_rank_scores.append(rank_score)
+
         case_results.append(
             RetrievalCaseResult(
                 question=case.question,

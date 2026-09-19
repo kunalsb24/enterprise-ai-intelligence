@@ -17,3 +17,6 @@ class RetrievedDocumentChunk(DocumentChunk):
     """A document chunk returned by semantic search."""
 
     similarity: float
+
+class RerankedDocumentChunk(RetrievedDocumentChunk):
+    reranking_score: float

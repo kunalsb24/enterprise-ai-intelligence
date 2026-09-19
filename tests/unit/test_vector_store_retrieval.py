@@ -52,3 +52,80 @@ def test_retrieve_chunks():
         mock_engine.dispose.assert_called_once()
 
         assert results == fake_results
+
+from unittest.mock import Mock, patch
+
+from enterprise_ai.document_processing.models import (
+    RerankedDocumentChunk,
+    RetrievedDocumentChunk,
+)
+from enterprise_ai.vector_store.retrieval import (
+    retrieve_and_rerank_chunks,
+)
+
+
+def test_retrieve_and_rerank_chunks():
+    candidates = [
+        RetrievedDocumentChunk(
+            document_name="billing.txt",
+            chunk_index=0,
+            content="Billing failures occurred.",
+            similarity=0.90,
+        ),
+        RetrievedDocumentChunk(
+            document_name="portal.txt",
+            chunk_index=0,
+            content="The portal did not change payment processing.",
+            similarity=0.70,
+        ),
+    ]
+
+    reranked = [
+        RerankedDocumentChunk(
+            document_name="portal.txt",
+            chunk_index=0,
+            content="The portal did not change payment processing.",
+            similarity=0.70,
+            reranking_score=0.95,
+        ),
+        RerankedDocumentChunk(
+            document_name="billing.txt",
+            chunk_index=0,
+            content="Billing failures occurred.",
+            similarity=0.90,
+            reranking_score=0.20,
+        ),
+    ]
+
+    embedding_model = Mock()
+    reranking_model = Mock()
+
+    with patch(
+        "enterprise_ai.vector_store.retrieval.retrieve_chunks",
+        return_value=candidates,
+    ) as mock_retrieve, patch(
+        "enterprise_ai.vector_store.retrieval.rerank_chunks",
+        return_value=reranked,
+    ) as mock_rerank:
+        results = retrieve_and_rerank_chunks(
+            query="Did the portal cause payment problems?",
+            candidate_limit=10,
+            final_limit=1,
+            embedding_model=embedding_model,
+            reranking_model=reranking_model,
+        )
+
+    assert len(results) == 1
+    assert results[0].document_name == "portal.txt"
+
+    mock_retrieve.assert_called_once_with(
+        query="Did the portal cause payment problems?",
+        limit=10,
+        embedding_model=embedding_model,
+    )
+
+    mock_rerank.assert_called_once_with(
+        query="Did the portal cause payment problems?",
+        chunks=candidates,
+        reranking_model=reranking_model,
+    )
