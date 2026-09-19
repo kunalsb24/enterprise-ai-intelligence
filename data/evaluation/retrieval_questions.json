@@ -1,0 +1,43 @@
+[
+  {
+    "question": "Which customer group experienced a higher concentration of payment failures?",
+    "expected_document": "billing_platform_incident_q2_2025.txt"
+  },
+  {
+    "question": "What caused some valid customer payment requests to fail?",
+    "expected_document": "billing_platform_incident_q2_2025.txt"
+  },
+  {
+    "question": "Which customers generated increased billing-related support requests during April and May?",
+    "expected_document": "support_operations_q2_2025.txt"
+  },
+  {
+    "question": "What additional network infrastructure was deployed across European markets?",
+    "expected_document": "network_expansion_q2_2025.txt"
+  },
+  {
+    "question": "Did the customer portal update change the systems that process payments?",
+    "expected_document": "customer_portal_release_q2_2025.txt"
+  },
+  {
+    "question": "What interruptions did some enterprise customers experience during security maintenance?",
+    "expected_document": "security_maintenance_q2_2025.txt"
+  }
+  ,
+{
+  "question": "Why were legitimate payments being rejected after the billing platform move?",
+  "expected_document": "billing_platform_incident_q2_2025.txt"
+},
+{
+  "question": "Which team saw heavier workloads because customers were struggling with invoices and payments?",
+  "expected_document": "support_operations_q2_2025.txt"
+},
+{
+  "question": "Were payment processing problems introduced by the redesigned self-service website?",
+  "expected_document": "customer_portal_release_q2_2025.txt"
+},
+{
+  "question": "What work was done to handle growing traffic and reduce congestion in European regions?",
+  "expected_document": "network_expansion_q2_2025.txt"
+}
+]

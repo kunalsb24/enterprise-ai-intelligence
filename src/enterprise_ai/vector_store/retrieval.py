@@ -11,10 +11,12 @@ from enterprise_ai.vector_store.repository import (
 def retrieve_chunks(
     query: str,
     limit: int = 3,
+    embedding_model: EmbeddingModel | None = None,
 ) -> list[RetrievedDocumentChunk]:
     """Retrieve document chunks that are semantically similar to a query."""
 
-    embedding_model = EmbeddingModel()
+    if embedding_model is None:
+        embedding_model = EmbeddingModel()
 
     query_embedding = embedding_model.embed_text(query)
 
