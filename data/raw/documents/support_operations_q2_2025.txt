@@ -1,0 +1,30 @@
+Support Operations Review
+Reporting Period: Q2 2025
+
+Overview
+
+Customer support teams handled increased case volumes during parts of the second quarter of 2025 across several European markets.
+
+Ticket Trends
+
+Billing-related support requests increased during April and May.
+
+Support teams received questions about invoices, unsuccessful payment attempts, account balances, and payment retries.
+
+The increase was particularly noticeable among Enterprise customers in Germany.
+
+Other support categories, including technical assistance and account administration, remained closer to normal operating levels.
+
+Customer Experience
+
+Some customers contacted support multiple times while attempting to resolve billing and payment-related issues.
+
+Support agents provided payment retry guidance and escalated unresolved cases to billing operations when necessary.
+
+Operations Response
+
+Additional support capacity was assigned to billing queues during periods of elevated demand.
+
+Support managers also improved escalation procedures between customer support and billing operations.
+
+By the end of June, billing-related ticket volumes had begun moving back toward normal levels.

@@ -1,0 +1,30 @@
+Network Expansion Report
+Reporting Period: Q2 2025
+
+Overview
+
+During the second quarter of 2025, the company expanded network capacity across several European markets to support increasing customer traffic and new enterprise connectivity requirements.
+
+Deployment Progress
+
+Additional network capacity was deployed in France, Germany, Spain, and the Netherlands.
+
+Engineering teams upgraded routing infrastructure and increased backbone capacity in several metropolitan regions.
+
+Customer Impact
+
+Most network upgrades were completed without significant customer disruption.
+
+A small number of customers experienced brief connectivity interruptions during scheduled maintenance windows.
+
+Enterprise customers were notified in advance when planned maintenance could affect their services.
+
+Performance
+
+Network utilization remained within expected operating ranges during the quarter.
+
+Following the upgrades, several regions showed improved capacity availability and reduced peak-period congestion.
+
+Next Steps
+
+Engineering teams will continue monitoring regional traffic growth and will schedule additional capacity upgrades where required.

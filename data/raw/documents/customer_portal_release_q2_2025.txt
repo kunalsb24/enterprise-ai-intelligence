@@ -1,0 +1,32 @@
+Customer Portal Release Report
+Reporting Period: Q2 2025
+
+Overview
+
+During the second quarter of 2025, the company released an updated customer self-service portal across several European markets.
+
+The release introduced improvements to account management, invoice viewing, support case tracking, and service administration.
+
+Rollout
+
+The updated portal was gradually released to customers in Germany, France, Spain, and the Netherlands.
+
+Enterprise customers received additional account-management features designed for organizations with multiple users and services.
+
+Customer Experience
+
+Most customers successfully transitioned to the updated portal.
+
+Some users reported difficulty locating previously available account settings after the interface redesign.
+
+Support teams published additional guidance and updated help documentation to assist customers with the new navigation.
+
+Billing Features
+
+Customers could continue viewing invoices and payment history through the portal.
+
+The release did not change the underlying systems responsible for processing customer payments.
+
+Next Steps
+
+Product teams will continue collecting customer feedback and improving portal usability during future releases.

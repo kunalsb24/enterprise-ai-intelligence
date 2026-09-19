@@ -71,3 +71,37 @@ def test_ingest_document_replaces_existing_chunks():
     fake_engine.dispose.assert_called_once()
 
     mock_model_class.assert_called_once()
+
+def test_ingest_documents_reuses_embedding_model():
+    paths = [
+        Path("document_one.txt"),
+        Path("document_two.txt"),
+    ]
+
+    with patch(
+        "enterprise_ai.vector_store.ingestion.EmbeddingModel"
+    ) as mock_model_class, patch(
+        "enterprise_ai.vector_store.ingestion.ingest_document"
+    ) as mock_ingest_document:
+
+        from enterprise_ai.vector_store.ingestion import (
+            ingest_documents,
+        )
+
+        ingest_documents(paths)
+
+        mock_model_class.assert_called_once()
+
+        embedding_model = mock_model_class.return_value
+
+        assert mock_ingest_document.call_count == 2
+
+        mock_ingest_document.assert_any_call(
+            paths[0],
+            embedding_model=embedding_model,
+        )
+
+        mock_ingest_document.assert_any_call(
+            paths[1],
+            embedding_model=embedding_model,
+        )

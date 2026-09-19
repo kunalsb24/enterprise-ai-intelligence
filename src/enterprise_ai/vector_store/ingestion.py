@@ -12,12 +12,16 @@ from enterprise_ai.vector_store.repository import (
 )
 
 
-def ingest_document(path: Path) -> None:
+def ingest_document(
+    path: Path,
+    embedding_model: EmbeddingModel | None = None,
+) -> None:
     """Process, embed, and store one document."""
 
     chunks = process_document(path)
 
-    embedding_model = EmbeddingModel()
+    if embedding_model is None:
+        embedding_model = EmbeddingModel()
 
     embedded_chunks = embed_chunks(
         chunks,
@@ -39,3 +43,16 @@ def ingest_document(path: Path) -> None:
             )
     finally:
         engine.dispose()
+
+def ingest_documents(
+    paths: list[Path],
+) -> None:
+    """Process, embed, and store multiple documents."""
+
+    embedding_model = EmbeddingModel()
+
+    for path in paths:
+        ingest_document(
+            path,
+            embedding_model=embedding_model,
+        )
