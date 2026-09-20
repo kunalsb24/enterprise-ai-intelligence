@@ -22,3 +22,21 @@ class RetrievalEvaluationResult(BaseModel):
     recall_at_k: float
     mean_reciprocal_rank: float
     case_results: list[RetrievalCaseResult]
+
+class RAGEvaluationCase(BaseModel):
+    question: str
+    expected_answer_contains: list[str]
+    should_abstain: bool = False
+
+class RAGCaseResult(BaseModel):
+    question: str
+    answer: str
+    should_abstain: bool
+    answer_correctness: float
+    abstention_correctness: float
+
+
+class RAGEvaluationResult(BaseModel):
+    answer_correctness: float
+    abstention_correctness: float
+    case_results: list[RAGCaseResult]

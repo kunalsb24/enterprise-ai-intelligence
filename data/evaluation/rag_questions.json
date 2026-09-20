@@ -1,0 +1,57 @@
+[
+  {
+    "question": "What caused some valid customer payment requests to fail?",
+    "expected_answer_contains": [
+      "configuration",
+      "billing"
+    ],
+    "should_abstain": false
+  },
+  {
+    "question": "Which customer group experienced a higher concentration of payment failures?",
+    "expected_answer_contains": [
+      "Germany",
+      "Enterprise"
+    ],
+    "should_abstain": false
+  },
+  {
+    "question": "What happened to billing-related support requests during April and May?",
+    "expected_answer_contains": [
+      "increased",
+      "billing"
+    ],
+    "should_abstain": false
+  },
+  {
+    "question": "Did the customer portal update change the systems responsible for processing payments?",
+    "expected_answer_contains": [
+      "did not",
+      "payment"
+    ],
+    "should_abstain": false
+  },
+  {
+    "question": "What work was done to handle growing traffic and reduce congestion in European regions?",
+    "expected_answer_contains": [
+      "network",
+      "capacity"
+    ],
+    "should_abstain": false
+  },
+  {
+    "question": "What was the company's total revenue in Q2 2025?",
+    "expected_answer_contains": [],
+    "should_abstain": true
+  },
+  {
+    "question": "Who was the company's CEO during Q2 2025?",
+    "expected_answer_contains": [],
+    "should_abstain": true
+  },
+  {
+    "question": "What was the company's share price at the end of June 2025?",
+    "expected_answer_contains": [],
+    "should_abstain": true
+  }
+]
