@@ -1,0 +1,51 @@
+[
+  {
+    "id": "sql_001",
+    "question": "How many customers are there?",
+    "expected_value": 10000,
+    "description": "Basic customer count"
+  },
+  {
+    "id": "sql_002",
+    "question": "What percentage of German Enterprise customers churned?",
+    "expected_value": 52.13,
+    "tolerance": 0.01,
+    "description": "Observed churn rate for German Enterprise customers"
+  },
+  {
+  "id": "sql_003",
+  "question": "How many German Enterprise customers are there?",
+  "expected_value": 376,
+  "description": "Customer count using country and segment filters"
+},
+{
+  "id": "sql_004",
+  "question": "What was the average Q2 transaction failure rate for German Enterprise customers?",
+  "expected_value": 0.1985,
+  "tolerance": 0.0001,
+  "description": "Average Q2 2025 failure rate using an aggregated customer feature"
+},
+{
+  "id": "sql_005",
+  "question": "How many failed transactions occurred in Germany during Q2 2025?",
+  "expected_value": 767,
+  "description": "Failed transaction count requiring a customer join and Q2 2025 date filtering"
+},
+{
+  "id": "sql_006",
+  "question": "How many Billing support tickets were created by German Enterprise customers during Q2 2025?",
+  "expected_value": 360,
+  "description": "Billing ticket count requiring a customer join, category filter, and Q2 2025 date filtering"
+},
+{
+    "id": "sql_007",
+    "question": "Which country has the highest customer churn rate?",
+    "expected_row": {
+        "country": "Spain",
+        "churn_rate": 73.41
+    },
+    "tolerance": 0.01,
+    "match_column_names": false,
+    "description": "Grouping, churn-rate calculation, ranking, and multi-column output"
+}
+]

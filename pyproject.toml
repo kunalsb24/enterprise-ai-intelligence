@@ -20,6 +20,7 @@ dependencies = [
     "sentence-transformers",
     "torch",
     "transformers",
+    "sqlglot>=30.18,<31.0",
 ]
 
 [project.optional-dependencies]
