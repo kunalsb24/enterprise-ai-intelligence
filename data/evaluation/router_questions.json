@@ -1,0 +1,47 @@
+[
+  {
+    "id": "route_001",
+    "question": "How many customers are there?",
+    "expected_route": "sql"
+  },
+  {
+    "id": "route_002",
+    "question": "What percentage of German Enterprise customers churned?",
+    "expected_route": "sql"
+  },
+  {
+    "id": "route_003",
+    "question": "Which country has the highest customer churn rate?",
+    "expected_route": "sql"
+  },
+  {
+    "id": "route_004",
+    "question": "What happened during the Q2 billing incident?",
+    "expected_route": "rag"
+  },
+  {
+    "id": "route_005",
+    "question": "What remediation actions were documented for the billing platform incident?",
+    "expected_route": "rag"
+  },
+  {
+    "id": "route_006",
+    "question": "What does the incident documentation say about the billing platform migration?",
+    "expected_route": "rag"
+  },
+  {
+    "id": "route_007",
+    "question": "Why did churn increase among German Enterprise customers in Q2?",
+    "expected_route": "hybrid"
+  },
+  {
+    "id": "route_008",
+    "question": "Did transaction failures increase during the documented billing incident, and what does the incident report say happened?",
+    "expected_route": "hybrid"
+  },
+  {
+    "id": "route_009",
+    "question": "How do the Q2 billing support metrics compare with the problems described in the incident documentation?",
+    "expected_route": "hybrid"
+  }
+]

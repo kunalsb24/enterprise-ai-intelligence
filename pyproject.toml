@@ -21,6 +21,7 @@ dependencies = [
     "torch",
     "transformers",
     "sqlglot>=30.18,<31.0",
+    "langgraph>=1.0,<2.0",
 ]
 
 [project.optional-dependencies]
