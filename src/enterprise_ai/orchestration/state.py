@@ -14,5 +14,6 @@ class OrchestrationState(TypedDict, total=False):
     sql_evidence: SQLQueryResult
     rag_evidence: RAGResult
 
-    final_answer: str
+    draft_answer: str
     verification: str
+    final_answer: str

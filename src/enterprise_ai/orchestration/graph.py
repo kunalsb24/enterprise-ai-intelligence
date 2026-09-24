@@ -7,6 +7,8 @@ from enterprise_ai.orchestration.nodes import (
     router_node,
     select_route,
     sql_node,
+    synthesis_node,
+    verification_node,
 )
 from enterprise_ai.orchestration.state import OrchestrationState
 from enterprise_ai.embeddings.model import EmbeddingModel
@@ -18,7 +20,7 @@ def select_after_sql(state: OrchestrationState) -> str:
     if state["route"] == "hybrid":
         return "rag"
 
-    return "end"
+    return "synthesis"
 
 def build_router_graph(
     llm: LocalLLM,
@@ -55,7 +57,21 @@ def build_router_graph(
         reranking_model=reranking_model,
     ),
 )
-    
+    graph.add_node(
+    "synthesis",
+    lambda state: synthesis_node(
+        state=state,
+        llm=llm,
+    ),
+)
+
+    graph.add_node(
+    "verification",
+    lambda state: verification_node(
+        state=state,
+        llm=llm,
+    ),
+)
 
     graph.add_edge(
         START,
@@ -77,10 +93,12 @@ def build_router_graph(
     select_after_sql,
     {
         "rag": "rag",
-        "end": END,
+        "synthesis": "synthesis",
     },
 )
-    graph.add_edge("rag", END)
+    graph.add_edge("rag", "synthesis")
+    graph.add_edge("synthesis", "verification")
+    graph.add_edge("verification", END)
     
 
     return graph.compile()

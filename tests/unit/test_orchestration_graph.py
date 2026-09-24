@@ -6,10 +6,24 @@ from enterprise_ai.sql_agent.models import SQLQueryResult
 
 
 class FakeLLM:
-    def __init__(self, route):
+    def __init__(self, route: str):
         self.route = route
 
     def generate(self, messages, max_new_tokens=200):
+        system_message = messages[0]["content"].lower()
+
+        if "verification component" in system_message:
+            return """
+            {
+                "status": "pass",
+                "issues": [],
+                "final_answer": "Verified grounded answer."
+            }
+            """
+
+        if "evidence synthesis component" in system_message:
+            return "Synthesized grounded answer."
+
         return self.route
 
 

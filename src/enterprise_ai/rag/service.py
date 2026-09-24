@@ -34,6 +34,7 @@ def answer_question(
         RAGSource(
             document_name=chunk.document_name,
             chunk_index=chunk.chunk_index,
+            text=chunk.content,
             similarity=chunk.similarity,
             reranking_score=chunk.reranking_score,
         )

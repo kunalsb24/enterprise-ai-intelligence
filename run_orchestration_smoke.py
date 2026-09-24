@@ -46,6 +46,15 @@ def main():
             print("\nRAG EVIDENCE:")
             print(result["rag_evidence"])
 
+        print("\nDRAFT ANSWER:")
+        print(result.get("draft_answer"))
+
+        print("\nVERIFICATION:")
+        print(result.get("verification"))
+
+        print("\nFINAL ANSWER:")
+        print(result.get("final_answer"))
+
 
 if __name__ == "__main__":
     main()
