@@ -58,3 +58,25 @@ def format_sql_facts(rows: list[dict]) -> str:
         facts.append(", ".join(row_facts))
 
     return "; ".join(facts)
+
+ABSTENTION_PHRASES = (
+    "not enough evidence",
+    "insufficient evidence",
+    "evidence is insufficient",
+    "cannot determine",
+    "does not contain",
+    "do not contain enough evidence",
+    "not available in the provided",
+    "no evidence",
+)
+
+
+def contains_abstention(text: str) -> bool:
+    """Return True when an answer explicitly indicates insufficient evidence."""
+
+    normalized_text = text.lower()
+
+    return any(
+        phrase in normalized_text
+        for phrase in ABSTENTION_PHRASES
+    )

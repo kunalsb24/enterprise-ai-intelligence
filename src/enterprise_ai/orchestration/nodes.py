@@ -20,6 +20,7 @@ from enterprise_ai.orchestration.verification import (
     contains_causal_claim,
     primary_sources_support_causation,
     format_sql_facts,
+    contains_abstention,
 )
 def router_node(
     state: OrchestrationState,
@@ -186,14 +187,25 @@ def verification_node(
         max_new_tokens=350,
     )
 
-    parsed_response = json.loads(raw_response)
-
-    verification = VerificationResult.model_validate(parsed_response)
+    try:
+        parsed_response = json.loads(raw_response)
+        verification = VerificationResult.model_validate(parsed_response)
+    except (json.JSONDecodeError, ValueError):
+        verification = VerificationResult(
+            status="revise",
+            issues=[
+                "The verifier returned an invalid structured response."
+            ],
+            final_answer=(
+                "Verification could not be completed reliably. "
+                "The answer has been withheld rather than returning "
+                "an unverified response."
+            ),
+        )
 
     if (
-        causal_claim_detected
+        contains_causal_claim(verification.final_answer)
         and not source_causation_supported
-        and verification.status == "pass"
     ):
         rewrite_messages = build_causal_rewrite_messages(
             question=question,
@@ -240,6 +252,49 @@ def verification_node(
             ],
             final_answer=rewritten_answer,
         )
+
+    if "rag_evidence" in state:
+        rag_abstained = contains_abstention(
+            state["rag_evidence"].answer
+        )
+
+        final_answer_abstained = contains_abstention(
+            verification.final_answer
+        )
+
+        if rag_abstained:
+            if "sql_evidence" in state:
+                sql_facts = format_sql_facts(
+                    state["sql_evidence"].rows
+                )
+
+                verification = VerificationResult(
+                    status="revise",
+                    issues=[
+                        "Deterministic abstention guardrail: RAG reported "
+                        "insufficient evidence, so supported SQL facts were "
+                        "preserved without inventing an explanation."
+                    ],
+                    final_answer=(
+                        f"Structured data reports: {sql_facts}. "
+                        "The provided evidence is insufficient to answer "
+                        "the unsupported part of the question."
+                    ),
+                )
+
+            elif not final_answer_abstained:
+                verification = VerificationResult(
+                    status="revise",
+                    issues=[
+                        "Deterministic abstention guardrail: the grounded RAG "
+                        "answer reported insufficient evidence, but the proposed "
+                        "final answer did not preserve that uncertainty."
+                    ],
+                    final_answer=(
+                        "The provided evidence is insufficient to answer "
+                        "the question."
+                    ),
+                )
 
     return {
         "verification": verification.model_dump_json(),

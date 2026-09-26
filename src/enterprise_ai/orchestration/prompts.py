@@ -15,6 +15,16 @@ Use this when the question asks for information contained in enterprise
 documents, such as incidents, explanations, policies, reports, procedures,
 or documented business context.
 
+Use rag for questions about whether a corporate or organizational event
+occurred, or what happened during such an event, when that fact would
+normally be established by documents rather than calculated from database
+rows. Examples include acquisitions, mergers, launches, migrations,
+outages, regulatory actions, investigations, and policy changes.
+
+Do not interpret a corporate-event term as a similarly worded database
+metric merely because structured data contains related products,
+transactions, customers, or counts.
+
 hybrid
 Use this when answering the question requires both quantitative database
 analysis and qualitative evidence from enterprise documents.
@@ -24,6 +34,14 @@ hybrid evidence. Use hybrid when the answer should both:
 1. establish or quantify a business outcome using structured data, and
 2. investigate documented events, incidents, or business context that may
    help explain that outcome.
+
+When a question asks why, how, or what explains a measurable business
+outcome, prefer hybrid if the outcome can be quantified from structured
+data and the explanation requires documentary context.
+
+The presence of an incident, event, or other documentary topic does not
+make the route rag-only when the question also requires establishing a
+measured outcome from structured data.
 
 Examples of measured business outcomes include churn, transaction failures,
 support ticket volumes, customer counts, rates, percentages, and other

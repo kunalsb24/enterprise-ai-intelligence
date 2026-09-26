@@ -5,6 +5,7 @@ from enterprise_ai.sql_agent.models import SQLQueryResult
 from enterprise_ai.rag.models import RAGResult
 
 from enterprise_ai.orchestration.verification import contains_causal_claim
+import json
 
 class FakeLLM:
     def generate(self, messages, max_new_tokens=200):
@@ -241,3 +242,208 @@ def test_verification_node_overrides_incorrect_pass_for_unsupported_causality():
     assert "52.13" in result["final_answer"]
     assert not contains_causal_claim(result["final_answer"])
     assert "does not establish a causal relationship" in result["final_answer"]
+
+def test_verification_node_handles_malformed_llm_response_safely():
+    from enterprise_ai.orchestration.nodes import verification_node
+
+    class FakeLLM:
+        def generate(self, messages, max_new_tokens=350):
+            return "This is not valid JSON."
+
+    state = {
+        "question": "What happened during the Q2 billing incident?",
+        "draft_answer": (
+            "The available evidence describes payment failures "
+            "during the Q2 billing incident."
+        ),
+    }
+
+    result = verification_node(
+        state=state,
+        llm=FakeLLM(),
+    )
+
+    assert '"status":"revise"' in result["verification"]
+    assert "verification could not be completed reliably" in (
+        result["final_answer"].lower()
+    )
+
+def test_verification_node_handles_invalid_llm_schema_safely():
+    from enterprise_ai.orchestration.nodes import verification_node
+
+    class FakeLLM:
+        def generate(self, messages, max_new_tokens=350):
+            return """
+            {
+                "status": "maybe",
+                "answer": "This does not match the required schema."
+            }
+            """
+
+    state = {
+        "question": "What happened during the Q2 billing incident?",
+        "draft_answer": (
+            "The available evidence describes payment failures "
+            "during the Q2 billing incident."
+        ),
+    }
+
+    result = verification_node(
+        state=state,
+        llm=FakeLLM(),
+    )
+
+    assert '"status":"revise"' in result["verification"]
+    assert "verification could not be completed reliably" in (
+        result["final_answer"].lower()
+    )
+
+def test_verification_node_blocks_unsafe_revised_causal_answer():
+    from enterprise_ai.orchestration.nodes import verification_node
+    from enterprise_ai.rag.models import RAGResult, RAGSource
+    from enterprise_ai.sql_agent.models import SQLQueryResult
+
+    class FakeLLM:
+        def generate(self, messages, max_new_tokens=350):
+            return """
+            {
+                "status": "revise",
+                "issues": ["The original answer needed revision."],
+                "final_answer": "Churn increased due to payment failures."
+            }
+            """
+
+    state = {
+        "question": (
+            "Why did churn increase among German Enterprise customers in Q2?"
+        ),
+        "sql_evidence": SQLQueryResult(
+            sql="SELECT 52.13 AS churn_percentage",
+            rows=[
+                {
+                    "segment": "Enterprise",
+                    "country": "Germany",
+                    "churn_percentage": 52.13,
+                }
+            ],
+        ),
+        "rag_evidence": RAGResult(
+            answer="Payment failures affected customers.",
+            sources=[
+                RAGSource(
+                    document_name="billing_incident.txt",
+                    chunk_index=0,
+                    text=(
+                        "German Enterprise customers experienced elevated "
+                        "payment failures during Q2."
+                    ),
+                    similarity=0.9,
+                    reranking_score=0.9,
+                )
+            ],
+        ),
+        "draft_answer": "The billing incident caused churn.",
+    }
+
+    result = verification_node(
+        state=state,
+        llm=FakeLLM(),
+    )
+
+    assert "52.13" in result["final_answer"]
+    assert not contains_causal_claim(result["final_answer"])
+    assert "does not establish a causal relationship" in (
+        result["final_answer"]
+    )
+
+def test_verification_node_preserves_rag_abstention():
+    """A grounded RAG abstention must not become a confident final claim."""
+
+    from enterprise_ai.orchestration.nodes import verification_node
+    class FakeLLM:
+        def generate(self, messages, max_new_tokens):
+            return json.dumps(
+                {
+                    "status": "pass",
+                    "issues": [],
+                    "final_answer": (
+                        "The company did not complete any acquisitions "
+                        "in Q2 2025."
+                    ),
+                }
+            )
+
+    state = {
+        "question": (
+            "What acquisition did the company complete in Q2 2025?"
+        ),
+        "draft_answer": (
+            "The company did not complete any acquisitions in Q2 2025."
+        ),
+        "rag_evidence": RAGResult(
+            answer=(
+                "The provided evidence is insufficient to answer "
+                "the question."
+            ),
+            sources=[],
+        ),
+    }
+
+    result = verification_node(
+        state=state,
+        llm=FakeLLM(),
+    )
+
+    assert "insufficient" in result["final_answer"].lower()
+
+def test_verification_node_preserves_sql_facts_when_rag_abstains():
+    """Hybrid answers should keep SQL facts while preserving RAG uncertainty."""
+
+    from enterprise_ai.orchestration.nodes import verification_node
+
+    class FakeLLM:
+        def generate(self, messages, max_new_tokens):
+            return json.dumps(
+                {
+                    "status": "pass",
+                    "issues": [],
+                    "final_answer": (
+                        "The provided evidence is insufficient to answer "
+                        "the question."
+                    ),
+                }
+            )
+
+    state = {
+        "question": (
+            "Why did churn increase among German Enterprise customers in Q2?"
+        ),
+        "sql_evidence": SQLQueryResult(
+            sql="SELECT 52.13 AS churn_percentage",
+            rows=[
+                {
+                    "segment": "Enterprise",
+                    "country": "Germany",
+                    "churn_percentage": 52.13,
+                }
+            ],
+        ),
+        "rag_evidence": RAGResult(
+            answer=(
+                "The provided evidence is insufficient to answer "
+                "the question."
+            ),
+            sources=[],
+        ),
+        "draft_answer": (
+            "The provided evidence is insufficient to answer the question."
+        ),
+    }
+
+    result = verification_node(
+        state=state,
+        llm=FakeLLM(),
+    )
+
+    assert "52.13" in result["final_answer"]
+    assert "insufficient" in result["final_answer"].lower()
